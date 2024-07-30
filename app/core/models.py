@@ -8,9 +8,13 @@ from django.contrib.auth.models import(
     BaseUserManager,
     PermissionsMixin,
 )
+
+
 class UserManager(BaseUserManager):
     '''Manager for Users'''
     def create_user(self, email, password=None, **extrafields):
+        if not email:
+            raise ValueError('Email can not be empty!')
         user = self.model(email=self.normalize_email(email), **extrafields)
         user.set_password(password)
         user.save(using=self._db)
