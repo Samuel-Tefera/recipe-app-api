@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework.authtoken',
     'user',
+    'recipe',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
