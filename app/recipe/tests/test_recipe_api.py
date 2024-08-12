@@ -10,7 +10,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Recipe
+from core.models import Recipe, Tag
 
 from recipe.serializers import (
     RecipeSerializers,
@@ -176,3 +176,50 @@ class PrivateRecipeAPITest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Recipe.objects.filter(id=recipe.id).exists())
+
+    def test_create_recipe_with_new_tag(self):
+        payloads = {
+            'title' : 'Thai Prawn Carry',
+            'time_minutes' : 30,
+            'price' : Decimal('2.50'),
+            'tags' : [{'name' : 'Thai'}, {'name' : 'Dinner'}]
+        }
+
+        res = self.client.post(RECIPE_URL, payloads, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        recipe = Recipe.objects.filter(user=self.user)
+        self.assertEqual(recipe.count(), 1)
+        recipe = recipe[0]
+
+        for tag in payloads['tags']:
+            exists = recipe.tags.filter(
+                tags=tag['name'],
+                user=self.user,
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_creat_recipe_with_existing_tag(self):
+        tad_indian = Tag.objects.create(user=self.user, name='Indian')
+        payloads = {
+            'title' : 'Thai Prawn Carry',
+            'time_minutes' : 30,
+            'price' : Decimal('2.50'),
+            'tags' : [{'name' : 'Indian'}, {'name' : 'Breakfast'}]
+        }
+
+        res = self.client.post(RECIPE_URL, payloads, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        recipe = Recipe.objects.filter(user=self.user)
+        self.assertEqual(recipe.count(), 1)
+        recipe = recipe[0]
+        self.assertEqual(recipe.tags.count(), 2)
+        self.assertIn(tad_indian, recipe.tags.all())
+
+        for tag in payloads['tags']:
+            exists = recipe.tags.filter(
+                tags=tag['name'],
+                user=self.user,
+            ).exists()
+            self.assertTrue(exists)
