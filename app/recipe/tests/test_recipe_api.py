@@ -194,7 +194,7 @@ class PrivateRecipeAPITest(TestCase):
 
         for tag in payloads['tags']:
             exists = recipe.tags.filter(
-                tags=tag['name'],
+                name=tag['name'],
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
@@ -219,7 +219,7 @@ class PrivateRecipeAPITest(TestCase):
 
         for tag in payloads['tags']:
             exists = recipe.tags.filter(
-                tags=tag['name'],
+                name=tag['name'],
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
