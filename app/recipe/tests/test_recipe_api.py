@@ -266,7 +266,7 @@ class PrivateRecipeAPITest(TestCase):
             'title' : 'Pie',
             'time_minutes' : 20,
             'price' : Decimal('40.0'),
-            'ingredients' : [{'name' : 'Pie'}, {'name', 'Salt'}]
+            'ingredients' : [{'name' : 'Pie'}, {'name' : 'Salt'}]
         }
 
         res = self.client.post(RECIPE_URL, payload, format='json')
@@ -276,8 +276,8 @@ class PrivateRecipeAPITest(TestCase):
         recipe = recipe[0]
         self.assertEqual(recipe.ingredients.count(), 2)
 
-        for ings in payload('ingredients'):
-            exists = recipe.objects.filter(
+        for ings in payload['ingredients']:
+            exists = recipe.ingredients.filter(
                 name=ings['name'],
                 user=self.user
             ).exists()
@@ -288,7 +288,7 @@ class PrivateRecipeAPITest(TestCase):
         ingt = Ingredient.objects.create(user=self.user, name='Pie')
         payload = {
             'title' : 'Sweet Pie',
-            'time minutes' : 30,
+            'time_minutes' : 30,
             'price' : Decimal('23.89'),
             'ingredients' : [{'name' : 'Pie'}, {'name' : 'Sugar'}]
         }
