@@ -10,7 +10,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Recipe, Tag
+from core.models import Recipe, Tag, Ingredient
 
 from recipe.serializers import (
     RecipeSerializers,
@@ -260,4 +260,26 @@ class PrivateRecipeAPITest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.tags.count(), 0)
-        
+
+    def test_create_recipe_ingredient(self):
+        payload = {
+            'title' : 'Pie',
+            'time_minutes' : 20,
+            'price' : Decimal('40.0'),
+            'ingredients' : [{'name' : 'Pie'}, {'name', 'Salt'}]
+        }
+
+        res = self.client.post(RECIPE_URL, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipe = Recipe.objects.filter(user=self.user)
+        self.assertEqual(recipe.count(), 1)
+        recipe = recipe[0]
+        self.assertEqual(recipe.ingredients.count(), 2)
+
+        for ings in payload('ingredients'):
+            exists = recipe.objects.filter(
+                name=ings['name'],
+                user=self.user
+            ).exists()
+
+            self.assertTrue(exists)
